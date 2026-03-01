@@ -1,0 +1,5 @@
+# .dockerignore
+data/
+runs/
+__pycache__/
+*.npy

@@ -1,0 +1,133 @@
+version: '3.8'
+
+services:
+  cleanup:
+    image: alpine:latest
+    volumes:
+      - ./runs:/app/runs
+    command: /bin/sh -c "rm -rf /app/runs/*"
+  server:
+    build: .
+    command: python server.py
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./runs:/app/runs  # Save dashboard logs locally
+    networks:
+      - fed_net
+    depends_on:
+      cleanup:
+        condition: service_completed_successfully
+
+  dashboard:
+    build: .
+    command: streamlit run app.py --server.port=8501 --server.address=0.0.0.0 --server.fileWatcherType poll
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+      - ./runs:/app/runs
+    depends_on:
+      cleanup:
+        condition: service_completed_successfully
+      server:
+        condition: service_started
+    networks:
+      - fed_net
+
+      
+
+  # THE 10 EDGE DEVICES
+  edge_01:
+    build: .
+    command: python client.py --pid chb01 --server server:8080
+    volumes:
+      - ./data:/app/data
+      - ./runs:/app/runs
+    depends_on: [server]
+    networks: [fed_net]
+
+  edge_03:
+    build: .
+    command: python client.py --pid chb03 --server server:8080
+    volumes:
+      - ./data:/app/data
+      - ./runs:/app/runs
+    depends_on: [server]
+    networks: [fed_net]
+
+  edge_04:
+    build: .
+    command: python client.py --pid chb04 --server server:8080
+    volumes:
+      - ./data:/app/data
+      - ./runs:/app/runs
+    depends_on: [server]
+    networks: [fed_net]
+
+  edge_05:
+    build: .
+    command: python client.py --pid chb05 --server server:8080
+    volumes:
+      - ./data:/app/data
+      - ./runs:/app/runs
+    depends_on: [server]
+    networks: [fed_net]
+
+  edge_08:
+    build: .
+    command: python client.py --pid chb08 --server server:8080
+    volumes:
+      - ./data:/app/data
+      - ./runs:/app/runs
+    depends_on: [server]
+    networks: [fed_net]
+
+  edge_09:
+    build: .
+    command: python client.py --pid chb09 --server server:8080
+    volumes:
+      - ./data:/app/data
+      - ./runs:/app/runs
+    depends_on: [server]
+    networks: [fed_net]
+
+  edge_10:
+    build: .
+    command: python client.py --pid chb10 --server server:8080
+    volumes:
+      - ./data:/app/data
+      - ./runs:/app/runs
+    depends_on: [server]
+    networks: [fed_net]
+
+  edge_15:
+    build: .
+    command: python client.py --pid chb15 --server server:8080
+    volumes:
+      - ./data:/app/data
+      - ./runs:/app/runs
+    depends_on: [server]
+    networks: [fed_net]
+
+  edge_18:
+    build: .
+    command: python client.py --pid chb18 --server server:8080
+    volumes:
+      - ./data:/app/data
+      - ./runs:/app/runs
+    depends_on: [server]
+    networks: [fed_net]
+
+  edge_22:
+    build: .
+    command: python client.py --pid chb22 --server server:8080
+    volumes:
+      - ./data:/app/data
+      - ./runs:/app/runs
+    depends_on: [server]
+    networks: [fed_net]
+
+networks:
+  fed_net:
+    driver: bridge
