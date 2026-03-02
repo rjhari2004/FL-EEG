@@ -5,6 +5,7 @@ from sklearn.metrics import accuracy_score, f1_score
 from sklearn.preprocessing import StandardScaler
 import flwr as fl
 import random
+import json
 warnings.filterwarnings("ignore")
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 DATA_DIR = "./data" # Looking at the local mapped folder
@@ -13,6 +14,22 @@ FS = 256
 WINDOW_SAMPLES = WINDOW_SEC * FS
 COMPRESSED_DIM = 64
 MU = 0.001
+import psutil
+import time
+import threading
+def log_resource_usage(pid, stop_event):
+    usage_log = []
+    while not stop_event.is_set():
+        # Get local process stats (the "Edge" view)
+        cpu = psutil.cpu_percent(interval=1)
+        mem = psutil.Process().memory_info().rss / (1024 * 1024) # MB
+        usage_log.append({"cpu": cpu, "mem": mem, "time": time.time()})
+        
+        # Periodically save to the shared /runs folder
+        with open(f"./runs/resources_{pid}.json", "w") as f:
+            json.dump(usage_log, f)
+        time.sleep(2)
+        
 def seed_everything(seed=42):
     random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
@@ -162,6 +179,12 @@ if __name__ == "__main__":
     parser.add_argument("--pid", type=str, required=True)
     parser.add_argument("--server", type=str, default="server:8080")
     args = parser.parse_args()
+
+    os.makedirs("./runs", exist_ok=True)
+    stop_logging = threading.Event()
+    tracker_thread = threading.Thread(target=log_resource_usage, args=(args.pid, stop_logging))
+    tracker_thread.daemon = True # Ensures thread dies if main script crashes
+    tracker_thread.start()
     
     print(f"Watch Activated for Patient: {args.pid}")
     
