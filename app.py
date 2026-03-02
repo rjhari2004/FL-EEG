@@ -71,6 +71,36 @@ if selection == "Global Summary":
 else:
     pid = selection
     st.title(f"🏥 Patient Edge Device: {pid}")
+    st.subheader("📡 Real-time Edge Resource Utilization")
+    res_path = f"./runs/resources_{pid}.json"
+    
+    if os.path.exists(res_path):
+        with open(res_path, "r") as f:
+            res_data = json.load(f)
+        
+        if res_data:
+            df_res = pd.DataFrame(res_data)
+            
+            # Show Metrics
+            m_col1, m_col2 = st.columns(2)
+            current_cpu = df_res['cpu'].iloc[-1]
+            current_mem = df_res['mem'].iloc[-1]
+            
+            m_col1.metric("Current CPU Usage", f"{current_cpu}%")
+            m_col2.metric("Current Memory usage", f"{current_mem:.1f} MB")
+            
+            # Show Charts
+            chart_col1, chart_col2 = st.columns(2)
+            with chart_col1:
+                st.markdown("**CPU Load Over Time (%)**")
+                st.line_chart(df_res['cpu'], height=200, use_container_width=True)
+            with chart_col2:
+                st.markdown("**Memory Footprint (MB)**")
+                st.line_chart(df_res['mem'], height=200, use_container_width=True)
+    else:
+        st.warning("No resource logs found for this patient yet.")
+
+    st.divider()
     p_data = patients[pid]
     
     boost = (p_data['personal_acc'] - p_data['global_acc']) * 100
