@@ -1,18 +1,17 @@
-version: '3.8'
-
 services:
   cleanup:
     image: alpine:latest
     volumes:
       - ./runs:/app/runs
     command: /bin/sh -c "rm -rf /app/runs/*"
+
   server:
     build: .
     command: python server.py
     ports:
       - "8080:8080"
     volumes:
-      - ./runs:/app/runs  # Save dashboard logs locally
+      - ./runs:/app/runs
     networks:
       - fed_net
     depends_on:
@@ -35,12 +34,16 @@ services:
     networks:
       - fed_net
 
-      
-
-  # THE 10 EDGE DEVICES
+  # THE 10 SIMULATED EDGE DEVICES
+  # We apply 'deploy' limits to mimic Raspberry Pi/Wearable hardware
   edge_01:
     build: .
     command: python client.py --pid chb01 --server server:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
     volumes:
       - ./data:/app/data
       - ./runs:/app/runs
@@ -50,6 +53,11 @@ services:
   edge_03:
     build: .
     command: python client.py --pid chb03 --server server:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
     volumes:
       - ./data:/app/data
       - ./runs:/app/runs
@@ -59,6 +67,11 @@ services:
   edge_04:
     build: .
     command: python client.py --pid chb04 --server server:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
     volumes:
       - ./data:/app/data
       - ./runs:/app/runs
@@ -68,6 +81,11 @@ services:
   edge_05:
     build: .
     command: python client.py --pid chb05 --server server:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
     volumes:
       - ./data:/app/data
       - ./runs:/app/runs
@@ -77,6 +95,11 @@ services:
   edge_08:
     build: .
     command: python client.py --pid chb08 --server server:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
     volumes:
       - ./data:/app/data
       - ./runs:/app/runs
@@ -86,6 +109,11 @@ services:
   edge_09:
     build: .
     command: python client.py --pid chb09 --server server:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
     volumes:
       - ./data:/app/data
       - ./runs:/app/runs
@@ -95,6 +123,11 @@ services:
   edge_10:
     build: .
     command: python client.py --pid chb10 --server server:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
     volumes:
       - ./data:/app/data
       - ./runs:/app/runs
@@ -104,6 +137,11 @@ services:
   edge_15:
     build: .
     command: python client.py --pid chb15 --server server:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
     volumes:
       - ./data:/app/data
       - ./runs:/app/runs
@@ -113,6 +151,11 @@ services:
   edge_18:
     build: .
     command: python client.py --pid chb18 --server server:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
     volumes:
       - ./data:/app/data
       - ./runs:/app/runs
@@ -122,6 +165,11 @@ services:
   edge_22:
     build: .
     command: python client.py --pid chb22 --server server:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
     volumes:
       - ./data:/app/data
       - ./runs:/app/runs
