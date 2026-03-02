@@ -1,9 +1,11 @@
-flwr==1.7.0
+# Use the CPU-specific wheel index for Torch
 --extra-index-url https://download.pytorch.org/whl/cpu
+flwr==1.7.0
 torch
-pandas
 numpy
+pandas
 scikit-learn
-tensorboard
+psutil
 streamlit
 matplotlib
+tensorboard
