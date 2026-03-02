@@ -1,22 +1,39 @@
-# Use a lightweight, stable Python base image to keep the container size small
-FROM python:3.10-slim
+# --- STAGE 1: Builder (The "Heavy" stage) ---
+FROM python:3.10-slim as builder
 
-# Prevent Python from writing .pyc files and force stdout to flush immediately (good for live logs)
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-# Set the working directory inside the virtual container
 WORKDIR /app
 
-# Copy the requirements file first to leverage Docker layer caching
-COPY requirements.txt /app/
+# Install compilers needed for psutil/numpy
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install the required libraries (no-cache-dir keeps the image size down)
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt .
 
-# Copy all the rest of your project files (server.py, client.py) into the container
-COPY . /app/
+# Install packages to a local user directory
+RUN pip install --user --no-cache-dir -r requirements.txt
 
-# Expose the ports for Flower Server (8080) and TensorBoard (6006)
+
+# --- STAGE 2: Final (The "Lightweight" stage) ---
+FROM python:3.10-slim
+
+# Standard environment settings
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PATH=/root/.local/bin:$PATH
+
+WORKDIR /app
+
+# Copy only the final installed libraries from the builder
+COPY --from=builder /root/.local /root/.local
+
+# Copy your code
+COPY *.py .
+
+# Ensure the shared volume directory exists
+RUN mkdir -p /app/runs
+
 EXPOSE 8080
-EXPOSE 6006
+EXPOSE 8501
+
+CMD ["python", "server.py"]
