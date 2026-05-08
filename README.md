@@ -1,8 +1,8 @@
 # FL-EEG
-Federated Learning Based Seizure Detection Using EEG 
-# 🧠 Federated Seizure Detection: Hybrid CA-Matrix & pFL
+Federated Learning Based Seizure Prediction Using EEG 
+# 🧠 Federated Seizure Prediction: Hybrid CA-Matrix & pFL
 
-This repository contains the complete implementation for a decentralized, privacy-preserving EEG seizure detection system. It utilizes **FedProx** for global model aggregation and **Personalized Federated Learning (pFL)** for patient-specific optimization using the **CHB-MIT Scalp EEG Database**.
+This repository contains the complete implementation for a decentralized, privacy-preserving EEG seizure Prediction system. It utilizes **FedProx** for global model aggregation and **Personalized Federated Learning (pFL)** for patient-specific optimization using the **CHB-MIT Scalp EEG Database**.
 
 ---
 
